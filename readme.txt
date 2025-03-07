@@ -81,14 +81,14 @@ python python/sheet.py manual stage-one-reject
 
 sqlite3 british-army-officers.db
 SELECT link_category, COUNT(*) FROM link GROUP BY link_category;
-# -1   Manually Confirmed	134
-# 0    High					6,959
-# 1    Good					7,771
-# 2    Fair					16,702
-# 3    Low					30,008
-# 4    Failed				30,048
-# 6    Manually Rejected	84
-# 7    Better Link Found	3,014
+# -1   Manually Confirmed   134
+# 0    High                 6,959
+# 1    Good                 7,771
+# 2    Fair                 16,702
+# 3    Low                  30,008
+# 4    Failed               30,048
+# 6    Manually Rejected    84
+# 7    Better Link Found    3,014
 .read sql/sheet-99-extend-undo.sql
 .read sql/sheet-99-extend-count.sql # Preview the number of records which we will be inserting into row as new sheet-99 entries.
 # Should be 33,146
@@ -115,14 +115,14 @@ python python/sheet.py internal-link-redirect
 
 sqlite3 british-army-officers.db
 SELECT link_category, COUNT(*) FROM link GROUP BY link_category;
-# -1   Manually Confirmed	134
-# 0    High					7,342
-# 1    Good					8,359
-# 2    Fair					17,089
-# 3    Low					33,577
-# 4    Failed				41,516
-# 6    Manually Rejected	84
-# 7    Better Link Found	3,365
+# -1   Manually Confirmed   134
+# 0    High                 7,342
+# 1    Good                 8,359
+# 2    Fair                 17,089
+# 3    Low                  33,577
+# 4    Failed               41,516
+# 6    Manually Rejected    84
+# 7    Better Link Found    3,365
 SELECT COUNT(*) FROM link WHERE substr(idkey, 1, 2) == '99';
 DELETE FROM link WHERE substr(idkey, 1, 2) == '99';
 .quit
@@ -145,15 +145,15 @@ sqlite3 british-army-officers.db
 .read sql/link-hydrate.sql
 .read sql/new-appointments.sql # Uses simple rules to determine if unlinked rows are likely to be newly appointed officers and marks them accordingly.
 SELECT link_category, COUNT(*) FROM link GROUP BY link_category;
-# -1   Manually Confirmed	6,893
-# 0    High					340,833
-# 1    Good					58,802
-# 2    Fair					55,886
-# 3    Low					38,097
-# 4    Failed				79,725
-# 5    New Appointment		21,912
-# 6    Manually Rejected	114
-# 7    Better Link Found	26,727
+# -1   Manually Confirmed   6,893
+# 0    High                 340,833
+# 1    Good                 58,802
+# 2    Fair                 55,886
+# 3    Low                  38,097
+# 4    Failed               79,725
+# 5    New Appointment      21,912
+# 6    Manually Rejected    114
+# 7    Better Link Found    26,727
 .quit
 
 # Finally, use the link table to calculate our theoretical historical individuals.
