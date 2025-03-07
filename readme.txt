@@ -162,6 +162,6 @@ python python/sheet.py person
 sqlite3 british-army-officers.db
 SELECT COUNT(*) FROM person;
 # Total people should be 92,892
-.read sql/row-linkinfo.sql # Hydrate the links with more information for testing / analysis purposes.
+.read sql/row-linkinfo.sql # Hydrate the row records with more information about their links, for more convenient analysis.
 .quit
 
