@@ -1,0 +1,1 @@
+UPDATE link SET link_category = 5 WHERE asheet = '99. All' AND (link_category = 4 OR link_category = 6 OR link_category = 7) AND (arank_lvl = 5 OR arank_lvl = -27 OR arank_lvl = -14) AND adate2 IS NULL AND areg_date BETWEEN (afileyear - 1)||'-01-01' AND afileyear||'-07-01';
