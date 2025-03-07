@@ -1,4 +1,7 @@
 
+Source code for the British Army Officers project
+-------------------------------------------------
+
 More information about this project can be found here: https://www.dhi.ac.uk/projects/british-army-officers/
 
 The code in this repository is intended to run inside a python virtual environment. To create this environment, run the following commands in a UNIX-like shell:
@@ -19,10 +22,10 @@ https://www.georgianarmyofficers.org/
 
 The process of ingesting, regularising and linking the spreadsheet files uses recipes from the accompanying Makefile. It is intended to run in a python virtual environment (see above) in a UNIX-like shell. The following commands and notes provide a step-by-step guide to the full process:
 
-# Enter the python virtual environment (if not already in it, see above)
+# Enter the python virtual environment (if not already in it, see above).
 source ../dhids/.venv/bin/activate
 
-# Ingest all the spreadsheet files
+# Ingest all the spreadsheet files.
 make sheet-ingest-all
 
 # You can query the database interactively at any point:
@@ -44,7 +47,7 @@ SELECT COUNT(*) FROM manual;
 # Total manual links should be 7,084
 .quit
 
-# Now we begin the linking process
+# Now we begin the linking process.
 # We assume that some sheets will not contain duplicates (the same person twice in a year), we call these "Category A" sheets.
 # "Category B" sheets are the opposite: Each person in them should definitely be repeated in a Category A sheet for that year.
 # "Category C" sheets are where a person may or may not also be in a Category A sheet.
@@ -124,7 +127,7 @@ SELECT COUNT(*) FROM link WHERE substr(idkey, 1, 2) == '99';
 DELETE FROM link WHERE substr(idkey, 1, 2) == '99';
 .quit
 
-# We are now finally ready to link between years
+# We are now finally ready to link between years.
 make sheet-link-external-all
 
 sqlite3 british-army-officers.db
@@ -153,7 +156,7 @@ SELECT link_category, COUNT(*) FROM link GROUP BY link_category;
 # 7    Better Link Found	26,727
 .quit
 
-# Finally, use the link table to calculate our theoretical historical individuals
+# Finally, use the link table to calculate our theoretical historical individuals.
 python python/sheet.py person
 
 sqlite3 british-army-officers.db
