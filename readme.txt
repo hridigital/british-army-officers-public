@@ -52,7 +52,7 @@ SELECT COUNT(*) FROM manual;
 # "Category B" sheets are the opposite: Each person in them should definitely be repeated in a Category A sheet for that year.
 # "Category C" sheets are where a person may or may not also be in a Category A sheet.
 # Please see the file 'British Army Officers Linking System.pdf' for more information.
-# 'sheet 99' is a concept whereby we use this logic to attempt to create a list of each historical person for each year without duplications, before we try to link people between years.
+# 'sheet 99' is a concept whereby we use this logic to attempt to create a list of historical people for each year without duplications, before we try to link people between years.
 
 python python/sheet.py manual-test pre99-confirm # Applies any manual links which change the initial contents of sheet 99 (i.e. violate the assumption that Category A sheets do not contain duplicates)
 python python/sheet.py manual-test pre99-reject
