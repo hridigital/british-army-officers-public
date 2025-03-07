@@ -11,33 +11,33 @@ pip install -U strsimpy
 pip install -U nameparser
 pip install -U rapidfuzz
 
-The code in this repository can be used to ingest the xlsx files contained in the data/drive folder into an SQLite database (https://www.sqlite.org/), apply regularisation to various fields, and then attempt to deduce which spreadsheet rows might refer to the same historial people, using rules implemented in the python/match.py file.
+The code in this repository can be used to ingest the xlsx files contained in the data/drive folder into an SQLite database (https://www.sqlite.org/), apply regularisation to various fields, and then attempt to deduce which spreadsheet rows might refer to the same historial people, using rules implemented in the file python/match.py.
 
 The database tables resulting from this process can be queried at the project website, accompanied by background material placing them in their historical context:
 
 https://www.georgianarmyofficers.org/
 
-The process of ingesting, regularising and linking the spreadsheet files uses recipes from the accompanying Makefile. It is intended to run in a python virtual environment (see above) in a UNIX-like shell. The following commands and notes provide step-by-step a guide to the full process:
+The process of ingesting, regularising and linking the spreadsheet files uses recipes from the accompanying Makefile. It is intended to run in a python virtual environment (see above) in a UNIX-like shell. The following commands and notes provide a step-by-step guide to the full process:
 
-# Enter the python virtual environment if not already in it (see above)
+# Enter the python virtual environment (if not already in it, see above)
 source ../dhids/.venv/bin/activate
 
 # Ingest all the spreadsheet files
 make sheet-ingest-all
 
-# You can query the database interactively at any point to check the process:
+# You can query the database interactively at any point:
 sqlite3 british-army-officers.db
 SELECT COUNT(*) FROM row;
-.quit
 # Total rows at this point should be 639,099
+.quit
 
-# Regularise the data:
+# Regularise the data. This script regularises names, regiments, ranks and dates throughout the row table.
 python python/reg_cmd.py re-reg
 
 # Calculate the most common names. This information is used to make decisions in the linking process.
 python python/reg_cmd.py common
 
-# Ingest the most recent copy of the manual links the project staff have made
+# Ingest the most recent copy of manual links made by the project staff.
 sqlite3 british-army-officers.db
 .read sql/manual-links-populate.sql
 SELECT COUNT(*) FROM manual;
@@ -45,13 +45,13 @@ SELECT COUNT(*) FROM manual;
 .quit
 
 # Now we begin the linking process
-# We assume that some sheets will not contain duplicates (the same person twice in one year), we call these "Category A" sheets".
+# We assume that some sheets will not contain duplicates (the same person twice in a year), we call these "Category A" sheets.
 # "Category B" sheets are the opposite: Each person in them should definitely be repeated in a Category A sheet for that year.
 # "Category C" sheets are where a person may or may not also be in a Category A sheet.
-# Please see the file 'British Army Officers Linking System.pdf' included in this repository.
-# 'sheet 99' is a concept whereby we use this logic to attempt to create a list of each historical person for each Army List year without repetitions, before we try to link between years.
+# Please see the file 'British Army Officers Linking System.pdf' for more information.
+# 'sheet 99' is a concept whereby we use this logic to attempt to create a list of each historical person for each year without duplications, before we try to link people between years.
 
-python python/sheet.py manual-test pre99-confirm # Applies any manual links which change the initial contents of sheet 99 (i.e. violate assumption that Category A sheets do not contain duplicates)
+python python/sheet.py manual-test pre99-confirm # Applies any manual links which change the initial contents of sheet 99 (i.e. violate the assumption that Category A sheets do not contain duplicates)
 python python/sheet.py manual-test pre99-reject
 python python/sheet.py manual pre99-confirm
 python python/sheet.py manual pre99-reject
@@ -63,6 +63,7 @@ SELECT COUNT(*) FROM row;
 # Total rows should be 1,132,855
 .quit
 
+# Link Category C sheets to Category A sheets.
 make sheet-link-internal-stage-one-all
 
 sqlite3 british-army-officers.db
@@ -70,7 +71,7 @@ SELECT COUNT(*) FROM link;
 # Total links should be 94,720
 .quit
 
-python python/sheet.py manual-test stage-one-confirm # Links the Category C sheets to Sheet 99. Category C sheets are where each person *may or may not* also be in a Category A Sheet.
+python python/sheet.py manual-test stage-one-confirm # Link the Category C sheets to Sheet 99.
 python python/sheet.py manual-test stage-one-reject
 python python/sheet.py manual stage-one-confirm
 python python/sheet.py manual stage-one-reject
@@ -86,12 +87,13 @@ SELECT link_category, COUNT(*) FROM link GROUP BY link_category;
 # 6    Manually Rejected	84
 # 7    Better Link Found	3,014
 .read sql/sheet-99-extend-undo.sql
-.read sql/sheet-99-extend-count.sql # Preview the number of records which you will be inserting into row as new sheet-99 entries.
+.read sql/sheet-99-extend-count.sql # Preview the number of records which we will be inserting into row as new sheet-99 entries.
 # Should be 33,146
-.read sql/sheet-99-extend.sql # Avoiding introducing duplicates to sheet-99 depends on good internal stage one linking.
+.read sql/sheet-99-extend.sql # Avoiding introducing duplicates to sheet-99 depends on good stage one linking.
 # Total rows should be 1,166,001
 .quit
 
+# Link Category B sheets to sheet 99.
 make sheet-link-internal-stage-two-all
 
 sqlite3 british-army-officers.db
@@ -99,12 +101,12 @@ SELECT COUNT(*) FROM link;
 # Total links should be 111,466
 .quit
 
-python python/sheet.py manual-test stage-two-confirm # Links the Category B sheets to Sheet 99. Category B sheets are where each person should definitely also be in a Category A Sheet.
+python python/sheet.py manual-test stage-two-confirm # Links the Category B sheets to Sheet 99.
 python python/sheet.py manual-test stage-two-reject # These sheets should *never* be able to get into Sheet 99.
 python python/sheet.py manual stage-two-confirm
 python python/sheet.py manual stage-two-reject
 
-# Internal links can only point to sheet 99. This can sometimes not happen eg. handwritten sheets.
+# Internal links (links within a year) should only point to sheet 99. This can sometimes be violated by the handwritten sheets.
 # The following command redirects all internal links to point to the sheet 99 version of the bidkey, or its successor sheet 99 record if it itself is linked.
 python python/sheet.py internal-link-redirect
 
@@ -138,7 +140,7 @@ python python/sheet.py manual external-reject
 sqlite3 british-army-officers.db
 # SELECT aidkey, COUNT(*) c FROM link GROUP BY aidkey HAVING c > 1; # Check that no aidkeys have more than one link
 .read sql/link-hydrate.sql
-.read sql/new-appointments.sql # Uses simple rules to determine if unlinked rows are likely to actually be newly appointed officers
+.read sql/new-appointments.sql # Uses simple rules to determine if unlinked rows are likely to be newly appointed officers and marks them accordingly.
 SELECT link_category, COUNT(*) FROM link GROUP BY link_category;
 # -1   Manually Confirmed	6,893
 # 0    High					340,833
@@ -151,11 +153,12 @@ SELECT link_category, COUNT(*) FROM link GROUP BY link_category;
 # 7    Better Link Found	26,727
 .quit
 
-# Finally, use the link table to calculate theoretical historical people
+# Finally, use the link table to calculate our theoretical historical individuals
 python python/sheet.py person
 
 sqlite3 british-army-officers.db
 SELECT COUNT(*) FROM person;
 # Total people should be 92,892
 .read sql/row-linkinfo.sql # Hydrate the links with more information for testing / analysis purposes.
+.quit
 
