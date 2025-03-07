@@ -14,7 +14,7 @@ pip install -U strsimpy
 pip install -U nameparser
 pip install -U rapidfuzz
 
-The code in this repository can be used to ingest the xlsx files contained in the data/drive folder into an SQLite database (https://www.sqlite.org/), apply regularisation to various fields, and then attempt to deduce which spreadsheet rows might refer to the same historial people, using rules implemented in the file python/match.py.
+The code in this repository can be used to ingest the xlsx files contained in the data/drive folder into an SQLite database (https://www.sqlite.org/), apply regularisation to various fields, and then attempt to deduce which spreadsheet rows might refer to the same historical people, using rules implemented in the file python/match.py.
 
 The database tables resulting from this process can be queried at the project website, accompanied by background material placing them in their historical context:
 
