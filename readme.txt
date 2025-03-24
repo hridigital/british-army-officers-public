@@ -23,7 +23,7 @@ https://www.georgianarmyofficers.org/
 The process of ingesting, regularising and linking the spreadsheet files uses recipes from the accompanying Makefile. It is intended to run in a python virtual environment (see above) in a UNIX-like shell. The following commands and notes provide a step-by-step guide to the full process:
 
 # Enter the python virtual environment (if not already in it, see above).
-source ../dhids/.venv/bin/activate
+source .venv/bin/activate
 
 # Ingest all the spreadsheet files.
 make sheet-ingest-all
